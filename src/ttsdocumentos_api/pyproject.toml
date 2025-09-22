@@ -1,0 +1,16 @@
+[project]
+name = "ttsdocumentos-api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.116.1",
+    "kokoro-onnx>=0.4.9",
+    "requests>=2.32.4",
+    "soundfile>=0.13.1",
+    "ttsdocumentos-core",
+]
+
+[tool.uv.sources]
+ttsdocumentos-core = { workspace = true }

@@ -1,0 +1,21 @@
+[project]
+name = "ttsdocumentos"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "ttsdocumentos_lib_core",
+    "ttsdocumentos_api",
+    "ttsdocumentos_workers",
+]
+
+[tool.taskipy.tasks]
+api = "uv --project ttsdocumentos_api run fastapi dev ttsdocumentos_api/main.py"
+iniciar_workers = "uv --project ttsdocumentos_workers run ./ttsdocumentos_workers/main.py"
+
+[dependency-groups]
+dev = [
+    "taskipy>=1.14.1",
+]

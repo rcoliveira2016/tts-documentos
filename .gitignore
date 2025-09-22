@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual Environment
+.venv/
+env/
+venv/
+
+# IDEs/Editors
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+*.out
+*.err
+
+# Environment Variables
+.env
+.env.*
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.pyd
+
+# Test Coverage Reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+*.cover
+*.py,cover
+.cache
+
+# Azure
+*.azure/
+*.azure-pipelines.yml
+
+# Build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Static Files
+staticfiles/
+media/
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
+
+src_old/
+src/models/
+src/azurite/
+src/azurite_data/
