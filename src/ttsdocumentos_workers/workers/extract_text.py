@@ -34,7 +34,6 @@ async def processar_estrair_texto(message: AbstractIncomingMessage):
             )
 
     azure_blob_utils.delete_file(payload.name_file)
-    logger.info(f"Arquivo baixado em: {name_file}")
     return retorno
 
 async def processar_estrair_texto_wrapper(msg, connection: RabbitMQConnection):

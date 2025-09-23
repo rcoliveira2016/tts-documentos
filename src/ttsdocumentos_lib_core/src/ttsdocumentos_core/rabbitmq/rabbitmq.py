@@ -82,7 +82,7 @@ class RabbitMQConsumer:
         if not self.connection.channel:
             raise RuntimeError("❌ Canal RabbitMQ não está conectado.")
         queue = await self.connection.channel.declare_queue(self.queue_name, durable=True)
-        await queue.consume(lambda msg: self._on_message(msg, callback))
+        await queue.consume(lambda msg: self._on_message(msg, callback), no_ack=False)
 
     async def _on_message(self, message: AbstractIncomingMessage, callback):
         async with message.process():

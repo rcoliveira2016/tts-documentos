@@ -56,7 +56,7 @@ media/
 .DS_Store
 Thumbs.db
 
-src_old/
+src/TEMP_FILES
 src/models/
 src/azurite/
 src/azurite_data/

@@ -52,14 +52,9 @@ async def shutdown_event():
 
 @routerDocumentos.post("/importar")
 async def importar_documentos(
-    document_id: Annotated[str, Form()],
     file: Annotated[UploadFile, File()]
 ):
-    try:
-        document_id_guid = uuid.UUID(document_id)
-    except ValueError:
-        logger.error(f"Invalid document ID: {document_id}")
-        raise HTTPException(status_code=400, detail="Document ID must be a valid GUID")
+    document_id_guid = str(uuid.uuid4())
     
     if not file:
         logger.error("File is required")
@@ -82,9 +77,12 @@ async def importar_documentos(
     file.file.close()
 
     await iniciar_fila(ExtractTextDTO(
-        document_id=document_id,
+        document_id=document_id_guid,
         name_file=name_file,
         language="pt"
     ).to_dict())
 
-    return {"Mensagem": "Processando importação de documentos"}
+    return {
+        "Mensagem": "Processando importação de documentos",
+        "DocumentId": document_id_guid
+        }
