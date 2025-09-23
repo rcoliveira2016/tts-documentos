@@ -6,6 +6,7 @@ from typing import Annotated
 import uuid
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from ttsdocumentos_core.azure_blob import AzureBlobUtils
+from ttsdocumentos_core.domiain.workers.extract_text_dto import ExtractTextDTO
 from ttsdocumentos_core.log.log_maneger import LogLevels, LoggerManager, LoggerNames
 from ttsdocumentos_core.config import settings
 from ttsdocumentos_core.rabbitmq.rabbitmq import RabbitMQConnection, RabbitMQProducer
@@ -23,29 +24,26 @@ routerDocumentos = APIRouter(
 rabbit_connection: RabbitMQConnection | None = None
 producer: RabbitMQProducer | None = None
 
-async def iniciar_fila(prod: RabbitMQProducer, body: dict):
-    if not prod:
+async def iniciar_fila(body: dict):
+    global producer
+
+    await conectar_rabbitmq()
+
+    if not producer:
         raise HTTPException(status_code=500, detail="RabbitMQ producer is not initialized")
+    
     await producer.setup_exchange()
-    await producer.bind_queue("extract_text", "extract_text_routing_key")
-    await prod.publishJson(body, routing_key="extract_text_routing_key")
+    await producer.bind_queue(ExtractTextDTO.QUEUE_NAME, f"{ExtractTextDTO.QUEUE_NAME}_routing_key")
+    await producer.publishJson(body, routing_key=f"{ExtractTextDTO.QUEUE_NAME}_routing_key")
 
 
-async def conectar_rabbitmq_com_retry():
+async def conectar_rabbitmq():
     """Tenta conectar ao RabbitMQ em background com retry exponencial"""
     global rabbit_connection, producer
     logger.info("Attempting to connect to RabbitMQ(temiout)...")
-
-    await asyncio.sleep(20)
-
     rabbit_connection = await RabbitMQConnection(settings).connect()
     producer = RabbitMQProducer(rabbit_connection)
     logger.info("Connected to RabbitMQ")
-
-@routerDocumentos.on_event("startup")
-async def startup_event():
-    asyncio.create_task(conectar_rabbitmq_com_retry())
-
 
 @routerDocumentos.on_event("shutdown")
 async def shutdown_event():
@@ -55,8 +53,7 @@ async def shutdown_event():
 @routerDocumentos.post("/importar")
 async def importar_documentos(
     document_id: Annotated[str, Form()],
-    file: Annotated[UploadFile, File()],
-    prod: RabbitMQProducer = Depends(lambda: producer)
+    file: Annotated[UploadFile, File()]
 ):
     try:
         document_id_guid = uuid.UUID(document_id)
@@ -84,6 +81,10 @@ async def importar_documentos(
     temp_file.close()
     file.file.close()
 
-    await iniciar_fila(prod, {"document_id": name_file})
+    await iniciar_fila(ExtractTextDTO(
+        document_id=document_id,
+        name_file=name_file,
+        language="pt"
+    ).to_dict())
 
     return {"Mensagem": "Processando importação de documentos"}

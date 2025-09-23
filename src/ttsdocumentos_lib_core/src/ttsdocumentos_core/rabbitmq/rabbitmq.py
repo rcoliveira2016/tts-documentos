@@ -1,7 +1,10 @@
 import json
 import aio_pika
 from aio_pika.abc import AbstractIncomingMessage
-from ttsdocumentos_core.config import Settings  # importa sua classe de config
+from ttsdocumentos_core.config import Settings
+from ttsdocumentos_core.log.log_maneger import LogLevels, LoggerManager, LoggerNames  # importa sua classe de config
+
+logger = LoggerManager(nome=LoggerNames.WORKER, level=LogLevels.DEBUG)
 
 
 class RabbitMQConnection:
@@ -59,6 +62,15 @@ class RabbitMQProducer:
             aio_pika.Message(body=body, content_type="application/json"),
             routing_key=routing_key,            
         )
+    async def publish(self, payload: str, routing_key: str):
+        """Publica um objeto Python (dict) serializado."""
+        if not self.connection.channel or not self.exchange:
+            raise RuntimeError("❌ Canal RabbitMQ ou exchange não está configurado.")
+        body = payload
+        await self.exchange.publish(
+            aio_pika.Message(body=body, content_type="application/json"),
+            routing_key=routing_key,            
+        )
 
 
 class RabbitMQConsumer:
@@ -74,4 +86,8 @@ class RabbitMQConsumer:
 
     async def _on_message(self, message: AbstractIncomingMessage, callback):
         async with message.process():
-            await callback(message)
+            try:
+                logger.info(f"✅ Mensagem recebida na fila '{self.queue_name}'")
+                await callback(message)
+            except Exception as e:
+                logger.error(f"❌ Erro ao processar mensagem: {e}")

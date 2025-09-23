@@ -37,7 +37,7 @@ class AzureBlobUtils:
         with open(download_path, "wb") as file:
             file.write(blob_client.download_blob().readall())
 
-        return f"Arquivo {blob_name} baixado com sucesso para {download_path}."
+        return file.name
 
     def delete_file(self, blob_name: str) -> str:
         """Deleta um arquivo do Azure Blob Storage."""

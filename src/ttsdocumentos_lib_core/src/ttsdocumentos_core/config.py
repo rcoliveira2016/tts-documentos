@@ -26,7 +26,10 @@ class Settings(BaseSettings):
     rabbitmq_user: str = Field(default="guest", env="RABBITMQ_USER")
     rabbitmq_pass: str = Field(default="guest", env="RABBITMQ_PASS")
     rabbitmq_host: str = Field(default="localhost", env="RABBITMQ_HOST")
-    rabbitmq_port: int = Field(default=5672, env="RABBITMQ_PORT")    
+    rabbitmq_port: int = Field(default=5672, env="RABBITMQ_PORT")
+
+    #WORKERS
+    file_temp_audio: str = Field(default="./TEMP_FILES", env="FILE_TEMP_AUDIO")
     
     class Config:
         env_file = ".env"  # permite carregar automaticamente de um arquivo .env
