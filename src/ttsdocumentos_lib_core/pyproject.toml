@@ -11,6 +11,8 @@ dependencies = [
     "aio-pika>=9.5.7",
     "azure-storage-blob>=12.26.0",
     "pydantic-settings>=2.10.1",
+    "soundfile>=0.13.1",
+    "kokoro-onnx>=0.4.9",
 ]
 
 [build-system]

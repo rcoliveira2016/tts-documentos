@@ -11,6 +11,12 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
@@ -40,6 +46,23 @@ services:
     environment:
       - RABBITMQ_HOST=rabbitmq
       - AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+
+  workers:
+    build:
+      context: .
+      dockerfile: ./ttsdocumentos_workers/Dockerfile
+    container_name: workers
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      azurite:
+        condition: service_started
+      api:
+        condition: service_started
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+
 
 volumes:
   default-azurite-volume:

@@ -14,7 +14,7 @@ class Settings(BaseSettings):
         default="", env="AZURE_CONTAINER_NAME"
     )
     allowed_extensions: list[str] = Field(
-        default=[".pdf", ".docx", ".txt"], env="ALLOWED_EXTENSIONS"
+        default=[".docx"], env="ALLOWED_EXTENSIONS"
     )
 
     # KOKORO

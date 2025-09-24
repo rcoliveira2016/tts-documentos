@@ -1523,18 +1523,14 @@ version = "0.1.0"
 source = { virtual = "ttsdocumentos_api" }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
-    { name = "kokoro-onnx" },
     { name = "requests" },
-    { name = "soundfile" },
     { name = "ttsdocumentos-core" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
-    { name = "kokoro-onnx", specifier = ">=0.4.9" },
     { name = "requests", specifier = ">=2.32.4" },
-    { name = "soundfile", specifier = ">=0.13.1" },
     { name = "ttsdocumentos-core", editable = "ttsdocumentos_lib_core" },
 ]
 
@@ -1545,14 +1541,18 @@ source = { editable = "ttsdocumentos_lib_core" }
 dependencies = [
     { name = "aio-pika" },
     { name = "azure-storage-blob" },
+    { name = "kokoro-onnx" },
     { name = "pydantic-settings" },
+    { name = "soundfile" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "aio-pika", specifier = ">=9.5.7" },
     { name = "azure-storage-blob", specifier = ">=12.26.0" },
+    { name = "kokoro-onnx", specifier = ">=0.4.9" },
     { name = "pydantic-settings", specifier = ">=2.10.1" },
+    { name = "soundfile", specifier = ">=0.13.1" },
 ]
 
 [[package]]

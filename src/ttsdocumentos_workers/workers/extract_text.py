@@ -22,7 +22,7 @@ async def processar_estrair_texto(message: AbstractIncomingMessage):
         logger.info(f"Arquivo baixado em: {pathFile}")
         with tempfile.NamedTemporaryFile(delete=True) as convert_file:
             pypandoc.convert_file(
-                pathFile,
+                source_file=pathFile,
                 to="markdown",
                 outputfile=convert_file.name,
                 extra_args=[
