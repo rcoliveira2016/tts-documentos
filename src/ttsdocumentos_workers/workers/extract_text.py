@@ -23,9 +23,11 @@ async def processar_estrair_texto(message: AbstractIncomingMessage):
         with tempfile.NamedTemporaryFile(delete=True) as convert_file:
             pypandoc.convert_file(
                 pathFile,
-                "md",
+                to="markdown",
                 outputfile=convert_file.name,
-                extra_args=["--standalone"]
+                extra_args=[
+                    "--standalone",
+                ]
             )
             retorno = TreatTextDTO(
                 name_file=payload.name_file,

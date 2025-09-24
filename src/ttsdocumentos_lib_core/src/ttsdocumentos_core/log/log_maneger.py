@@ -61,4 +61,5 @@ class LoggerManager:
     def warning(self, msg: str): self.logger.warning(msg)
     def error(self, msg: str): self.logger.error(msg)
     def critical(self, msg: str): self.logger.critical(msg)
+    def exception(self, msg, *args): self.logger.exception(msg, *args)
 

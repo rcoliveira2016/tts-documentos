@@ -8,7 +8,9 @@ COPY . /app
 
 # Install the application dependencies.
 WORKDIR /app
-RUN sudo apt-get install pandoc
+RUN wget https://github.com/jgm/pandoc/releases/download/3.1.8/pandoc-3.1.8-1-amd64.deb
+RUN sudo dpkg -i pandoc-3.1.8-1-amd64.deb
+
 RUN uv sync --frozen --no-cache
 
 # ...existing code...

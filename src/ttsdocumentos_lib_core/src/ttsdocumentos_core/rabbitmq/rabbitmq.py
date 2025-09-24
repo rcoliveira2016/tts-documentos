@@ -91,3 +91,4 @@ class RabbitMQConsumer:
                 await callback(message)
             except Exception as e:
                 logger.error(f"❌ Erro ao processar mensagem: {e}")
+                logger.exception("erro consummer",e)
