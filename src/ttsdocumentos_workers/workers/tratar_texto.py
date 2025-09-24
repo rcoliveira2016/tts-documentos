@@ -25,6 +25,7 @@ async def processar_tratar_texto(message: AbstractIncomingMessage):
     return TranscribeTextDTO(
         conteudo=conteudo,
         name_file=payload.name_file,
+        document_id=payload.document_id,
         language=payload.language
     )
 

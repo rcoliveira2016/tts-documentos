@@ -1,6 +1,9 @@
+import os
 from pathlib import Path
+import tempfile
 import wave
 from aio_pika.abc import AbstractIncomingMessage
+from ttsdocumentos_core.azure_blob import AzureBlobUtils
 from ttsdocumentos_core.domiain.workers.finalize_text_dto import FinalizeTextDTO
 from ttsdocumentos_core.domiain.workers.transcribe_text_dto import TranscribeTextDTO
 from ttsdocumentos_core.log.log_maneger import LogLevels, LoggerManager, LoggerNames
@@ -8,29 +11,39 @@ from ttsdocumentos_core.rabbitmq.rabbitmq import RabbitMQConnection, RabbitMQPro
 from ttsdocumentos_core.services.tts_service import tts_service
 from ttsdocumentos_core.config import settings
 
+azure_blob_utils = AzureBlobUtils()
 logger = LoggerManager(nome=LoggerNames.WORKER, level=LogLevels.DEBUG)
 
 async def processar_transcrever_texto(message: AbstractIncomingMessage):
     payload = TranscribeTextDTO.from_json(message.body.decode())
     logger.info(f"Transcrevendo texto do documento: {payload.name_file}")
 
-    arquivo = Path(f"{settings.file_temp_audio}/{payload.name_file}.wav")
-    arquivo.parent.mkdir(parents=True, exist_ok=True)
-    arquivo.exists() and arquivo.unlink()
-
     logger.info(f"Tamanho do conteúdo: {len(payload.conteudo)}")
 
-    with wave.open(str(arquivo), "wb") as wf:
-        wf.setnchannels(1)         # mono
-        wf.setsampwidth(2)         # int16 = 2 bytes
-        wf.setframerate(24000)     # taxa do TTS
+    with tempfile.NamedTemporaryFile(suffix=Path(payload.name_file).suffix, delete=False) as temp_file:
+        temp_path = temp_file.name 
 
-        # Converte float32 para int16 e escreve cada chunk
-        async for chunk in tts_service.audio_generator(payload.conteudo, voice="pm_santa", chunk_size=2048):
-            wf.writeframes(chunk)
+    try:
+        # Abre com wave para escrita
+        with wave.open(temp_path, "wb") as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(24000)
+
+            async for chunk in tts_service.audio_generator(payload.conteudo, voice="pm_santa", chunk_size=2048):
+                wf.writeframes(chunk)
+
+        # Faz upload
+        nome_arquivo_blob = f"{payload.document_id}.wav"
+        azure_blob_utils.upload_file(temp_path, nome_arquivo_blob)
+        logger.info(f"upload concluido {nome_arquivo_blob}")
+
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
     return FinalizeTextDTO(
-        path_audio=str(arquivo),
+        path_audio=str(nome_arquivo_blob),
         name_file=payload.name_file,
     )
 

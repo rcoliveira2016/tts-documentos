@@ -8,4 +8,5 @@ class TranscribeTextDTO(QueueDtoBase):
     QUEUE_NAME: ClassVar[str] = "transcribe_text"
     conteudo: str
     name_file: str
+    document_id: str
     language: str = "pt"

@@ -31,7 +31,8 @@ async def processar_estrair_texto(message: AbstractIncomingMessage):
             )
             retorno = TreatTextDTO(
                 name_file=payload.name_file,
-                conteudo=convert_file.read().decode('utf-8'),                
+                conteudo=convert_file.read().decode('utf-8'),  
+                document_id= payload.document_id,              
                 language=payload.language
             )
 
